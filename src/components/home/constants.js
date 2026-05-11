@@ -15,12 +15,4 @@ export const insightColors = {
   info:    { bg: '#EFF9FF', border: '#BAE6FD', text: '#0C4A6E' },
 };
 
-export const HUMORES = [
-  { nivel: 1, emoji: '😰', rotulo: 'Muito mal', cor: '#EF4444' },
-  { nivel: 2, emoji: '😟', rotulo: 'Mal',       cor: '#F97316' },
-  { nivel: 3, emoji: '😐', rotulo: 'Neutro',    cor: '#FFB703' },
-  { nivel: 4, emoji: '🙂', rotulo: 'Bem',       cor: '#06D6A0' },
-  { nivel: 5, emoji: '😄', rotulo: 'Muito bem', cor: '#7B2CBF' },
-];
-
 export const BG_GRADIENT = 'linear-gradient(160deg, #7B2CBF 0%, #9D4EDD 50%, #F72585 100%)';

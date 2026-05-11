@@ -4,16 +4,15 @@
 import React, { useState } from 'react';
 import Box            from '@mui/material/Box';
 import Typography     from '@mui/material/Typography';
-import { money, HUMORES } from './constants';
+import { money } from './constants';
 
-const CardHero = ({ debito, percentual, renda, humor, saldoReal = 0 }) => {
+const CardHero = ({ debito, percentual, renda, saldoReal = 0 }) => {
   const [mostrar, setMostrar] = useState(true);
 
   const saldoExibido  = renda + saldoReal;
   const despesasPagas = Math.max(0, -saldoReal);
   const pctPago       = renda > 0 ? Math.min(100, Math.round((despesasPagas / renda) * 100)) : 0;
   const barColor      = pctPago >= 80 ? '#FF4D6D' : pctPago >= 60 ? '#FFB703' : '#4DFFC3';
-  const humorObj      = humor ? HUMORES.find(h => h.nivel === humor.nivel) : null;
   const positivo      = saldoExibido >= 0;
 
   return (
@@ -61,7 +60,7 @@ const CardHero = ({ debito, percentual, renda, humor, saldoReal = 0 }) => {
       }} />
 
       <Box sx={{ px: 2.5, pt: 2, pb: 2, position: 'relative', zIndex: 1 }}>
-        {/* Label + humor + visibilidade */}
+        {/* Label + visibilidade */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography sx={{
             color: 'rgba(255,255,255,0.5)', fontSize: '0.62rem',
@@ -70,19 +69,6 @@ const CardHero = ({ debito, percentual, renda, humor, saldoReal = 0 }) => {
             Saldo Restante
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            {humorObj && (
-              <Box sx={{
-                display: 'flex', alignItems: 'center', gap: 0.4,
-                bgcolor: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '20px', px: 1, py: 0.35,
-              }}>
-                <Typography sx={{ fontSize: '0.75rem', lineHeight: 1 }}>{humorObj.emoji}</Typography>
-                <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
-                  {humorObj.rotulo}
-                </Typography>
-              </Box>
-            )}
             <Box
               onClick={() => setMostrar(v => !v)}
               sx={{

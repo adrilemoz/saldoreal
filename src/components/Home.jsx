@@ -19,21 +19,19 @@ import Slide         from '@mui/material/Slide';
 
 import FinanceiroService from '../services/FinanceiroService';
 import TelaOnboarding    from './home/TelaOnboarding';
-import TelaHumor         from './home/TelaHumor';
 import CardHero          from './home/CardHero';
 import InsightStrip      from './home/InsightStrip';
 import GraficoMensal     from './home/GraficoMensal';
 import QuickMenuCards    from './home/QuickMenuCards';
-import { money, saudacao, HUMORES } from './home/constants';
+import { money, saudacao } from './home/constants';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tela Perfil — Dialog fullscreen com Slide de baixo para cima
 // ─────────────────────────────────────────────────────────────────────────────
-const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoProp, humorHoje, onSaved }) => {
+const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoProp, onSaved }) => {
   const [nome,          setNome]          = useState('');
   const [inputRenda,    setInputRenda]    = useState('');
   const [diaPag,        setDiaPag]        = useState('');
-  const [humorSel,      setHumorSel]      = useState(null);
   const [salvando,      setSalvando]      = useState(false);
 
   useEffect(() => {
@@ -41,9 +39,8 @@ const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoP
       setNome(usuario || '');
       setInputRenda(renda || '');
       setDiaPag(diaPagamentoProp ? String(diaPagamentoProp) : '');
-      setHumorSel(humorHoje);
     }
-  }, [open, usuario, renda, diaPagamentoProp, humorHoje]);
+  }, [open, usuario, renda, diaPagamentoProp]);
 
   const handleRendaChange = (e) => {
     const raw = e.target.value.replace(/\D/g, '');
@@ -60,8 +57,7 @@ const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoP
       const dia = parseInt(diaPag);
       const diaValido = dia >= 1 && dia <= 31 ? dia : null;
       await FinanceiroService.setDiaPagamento(diaValido);
-      if (humorSel) await FinanceiroService.salvarHumor(humorSel.nivel, humorSel.rotulo);
-      onSaved({ nome: nome.trim(), renda: val, diaPagamento: diaValido, humor: humorSel });
+      onSaved({ nome: nome.trim(), renda: val, diaPagamento: diaValido });
       onClose();
     } finally {
       setSalvando(false);
@@ -121,29 +117,6 @@ const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoP
           helperText="Aparece a contagem regressiva na tela inicial"
           sx={{ mb: 2.5 }} />
 
-        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: 'text.secondary', letterSpacing: '0.8px', textTransform: 'uppercase', mb: 1 }}>
-          Humor Financeiro de Hoje
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
-          {HUMORES.map(h => {
-            const sel = humorSel?.nivel === h.nivel;
-            return (
-              <Box key={h.nivel} onClick={() => setHumorSel(h)} sx={{
-                display: 'flex', alignItems: 'center', gap: 0.7,
-                px: 1.3, py: 0.8, borderRadius: '12px', cursor: 'pointer',
-                border: `2px solid ${sel ? h.cor : 'rgba(0,0,0,0.08)'}`,
-                bgcolor: sel ? `${h.cor}14` : 'background.paper',
-                transition: 'all 0.15s', '&:active': { transform: 'scale(0.93)' },
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', lineHeight: 1 }}>{h.emoji}</Typography>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: sel ? 800 : 600, color: sel ? h.cor : 'text.secondary' }}>
-                  {h.rotulo}
-                </Typography>
-              </Box>
-            );
-          })}
-        </Box>
-
         <Button fullWidth variant="contained" size="large" disabled={salvando} onClick={salvar}
           sx={{ borderRadius: '16px', py: 1.5, fontWeight: 900, fontSize: '1rem',
             background: 'linear-gradient(135deg, #7B2CBF, #F72585)', boxShadow: '0 6px 22px rgba(123,44,191,0.35)' }}>
@@ -160,8 +133,6 @@ const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoP
 const Home = ({ setRoute }) => {
   const [carregando,     setCarregando]     = useState(true);
   const [usuario,        setUsuario]        = useState('');
-  const [mostrarHumor,   setMostrarHumor]   = useState(false);
-  const [humorHoje,      setHumorHoje]      = useState(null);
 
   const [renda,          setRenda]          = useState(0);
   const [diaPagamento,   setDiaPagamento]   = useState(null);
@@ -198,17 +169,14 @@ const Home = ({ setRoute }) => {
 
   useEffect(() => {
     (async () => {
-      const [nome, rendaDB, humorDB, diaDB] = await Promise.all([
+      const [nome, rendaDB, diaDB] = await Promise.all([
         FinanceiroService.getUsuario(),
         FinanceiroService.getRenda(),
-        FinanceiroService.getHumorHoje(),
         FinanceiroService.getDiaPagamento(),
       ]);
       setUsuario(nome);
       setRenda(rendaDB);
       setDiaPagamento(diaDB);
-      setHumorHoje(humorDB);
-      if (nome && !humorDB) setMostrarHumor(true);
       setCarregando(false);
     })();
   }, []);
@@ -255,12 +223,7 @@ const Home = ({ setRoute }) => {
     setRenda(rendaDB);
     setDiaPagamento(diaDB);
     setUsuario(nome);
-    setMostrarHumor(true);
   }} />;
-
-  if (mostrarHumor) return (
-    <TelaHumor nome={usuario} onConcluir={(h) => { setHumorHoje(h); setMostrarHumor(false); }} />
-  );
 
   const primeiroNome = usuario.split(' ')[0];
 
@@ -308,52 +271,32 @@ const Home = ({ setRoute }) => {
 
           <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
             {/* Badge dias para o pagamento */}
-            {diasParaPagamento !== null && (
-              <Box sx={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                px: 1.1, py: 0.55, borderRadius: '10px',
-                bgcolor: diasParaPagamento === 0
-                  ? 'rgba(16,185,129,0.12)'
-                  : diasParaPagamento === 1
-                  ? 'rgba(251,191,36,0.12)'
-                  : diasParaPagamento <= 3
-                  ? 'rgba(247,37,133,0.08)'
-                  : 'rgba(0,0,0,0.04)',
-                border: `1.5px solid ${diasParaPagamento === 0
-                  ? 'rgba(16,185,129,0.35)'
-                  : diasParaPagamento === 1
-                  ? 'rgba(251,191,36,0.4)'
-                  : diasParaPagamento <= 3
-                  ? 'rgba(247,37,133,0.25)'
-                  : 'rgba(0,0,0,0.07)'}`,
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4, lineHeight: 1 }}>
-                  <Typography sx={{ fontSize: '0.68rem', lineHeight: 1 }}>💰</Typography>
+            {diasParaPagamento !== null && (() => {
+              const urgente = diasParaPagamento <= 3;
+              const hoje    = diasParaPagamento === 0;
+              return (
+                <Box sx={{
+                  height: 38, px: 1.4, borderRadius: '12px',
+                  bgcolor: urgente ? 'rgba(247,37,133,0.08)' : 'rgba(0,0,0,0.04)',
+                  border: `1.5px solid ${urgente ? 'rgba(247,37,133,0.3)' : 'rgba(0,0,0,0.07)'}`,
+                  display: 'flex', alignItems: 'center', gap: 0.6,
+                  cursor: 'default',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="4" width="18" height="18" rx="3" stroke={urgente ? '#F72585' : '#9D4EDD'} strokeWidth="2" />
+                    <path d="M3 9h18" stroke={urgente ? '#F72585' : '#9D4EDD'} strokeWidth="2" />
+                    <path d="M8 2v4M16 2v4" stroke={urgente ? '#F72585' : '#9D4EDD'} strokeWidth="2" strokeLinecap="round" />
+                    <circle cx="12" cy="15" r="1.5" fill={urgente ? '#F72585' : '#9D4EDD'} />
+                  </svg>
                   <Typography sx={{
-                    fontSize: '0.68rem', fontWeight: 900, lineHeight: 1,
-                    color: diasParaPagamento === 0
-                      ? '#10B981'
-                      : diasParaPagamento === 1
-                      ? '#FBBF24'
-                      : diasParaPagamento <= 3
-                      ? '#F72585'
-                      : 'text.secondary',
+                    fontSize: '0.68rem', fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap',
+                    color: urgente ? '#F72585' : '#7B2CBF',
                   }}>
-                    {diasParaPagamento === 0
-                      ? 'Hoje!'
-                      : diasParaPagamento === 1
-                      ? 'Amanhã!'
-                      : `Faltam ${diasParaPagamento}d`}
+                    {hoje ? 'Hoje' : diasParaPagamento === 1 ? 'Amanhã' : `${diasParaPagamento}d`}
                   </Typography>
                 </Box>
-                <Typography sx={{
-                  fontSize: '0.5rem', fontWeight: 600, lineHeight: 1, mt: 0.25,
-                  color: 'text.disabled', letterSpacing: '0.2px',
-                }}>
-                  p/ salário
-                </Typography>
-              </Box>
-            )}
+              );
+            })()}
             {/* Sino de alertas */}
             <Box onClick={() => setModalAlertas(true)} sx={{
               width: 38, height: 38, borderRadius: '12px',
@@ -402,7 +345,7 @@ const Home = ({ setRoute }) => {
         </Box>
 
         {/* ── HERO ──────────────────────────────────────────────────────── */}
-        <CardHero debito={totalMes} percentual={percentual} renda={renda} humor={humorHoje} saldoReal={saldoReal} />
+        <CardHero debito={totalMes} percentual={percentual} renda={renda} saldoReal={saldoReal} />
 
         {/* ── INSIGHT ───────────────────────────────────────────────────── */}
         <InsightStrip insight={insight} />
@@ -423,12 +366,10 @@ const Home = ({ setRoute }) => {
         usuario={usuario}
         renda={renda}
         diaPagamento={diaPagamento}
-        humorHoje={humorHoje}
-        onSaved={({ nome, renda: r, diaPagamento: dp, humor }) => {
+        onSaved={({ nome, renda: r, diaPagamento: dp }) => {
           if (nome) setUsuario(nome);
           setRenda(r);
           setDiaPagamento(dp);
-          if (humor) setHumorHoje(humor);
           setToast({ open: true, msg: '✅ Perfil atualizado!', sev: 'success' });
         }}
       />

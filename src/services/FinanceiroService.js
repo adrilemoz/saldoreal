@@ -27,16 +27,6 @@ const FinanceiroService = {
   async getDiaPagamento()      { return this.getConfig('diaPagamento', null); },
   async setDiaPagamento(dia)   { return this.setConfig('diaPagamento', dia); },
 
-  async getHumorHoje() {
-    const hoje = new Date().toISOString().slice(0, 10);
-    return this.getConfig(`humor_${hoje}`, null);
-  },
-
-  async salvarHumor(nivel, rotulo) {
-    const hoje = new Date().toISOString().slice(0, 10);
-    return this.setConfig(`humor_${hoje}`, { nivel, rotulo, data: hoje });
-  },
-
   // ── LEITURA ───────────────────────────────────────────────────────────────
 
   async carregarAcordos() { return db.acordos.toArray(); },

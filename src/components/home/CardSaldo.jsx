@@ -4,16 +4,15 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 
-import { money, HUMORES } from './constants';
+import { money } from './constants';
 
-const CardSaldo = ({ debito, percentual, renda, humor, saldoReal = 0 }) => {
+const CardSaldo = ({ debito, percentual, renda, saldoReal = 0 }) => {
   const [mostrarValor, setMostrarValor] = useState(true);
 
   const saldoExibido   = renda + saldoReal;
   const despesasPagas  = Math.max(0, -saldoReal);
   const pctPago        = renda > 0 ? Math.min(100, Math.round((despesasPagas / renda) * 100)) : 0;
   const barColor       = pctPago >= 80 ? '#EF233C' : pctPago >= 60 ? '#FFB703' : '#06D6A0';
-  const humorObj       = humor ? HUMORES.find(h => h.nivel === humor.nivel) : null;
   const saldoPositivo  = saldoExibido >= 0;
 
   return (
@@ -44,12 +43,6 @@ const CardSaldo = ({ debito, percentual, renda, humor, saldoReal = 0 }) => {
             Saldo Restante no Mês
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            {humorObj && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(255,255,255,0.15)', borderRadius: '20px', px: 1.2, py: 0.4, backdropFilter: 'blur(4px)' }}>
-                <Typography sx={{ fontSize: '0.85rem' }}>{humorObj.emoji}</Typography>
-                <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{humorObj.rotulo}</Typography>
-              </Box>
-            )}
             {/* toggle visibilidade */}
             <Box onClick={() => setMostrarValor(v => !v)} sx={{ cursor: 'pointer', bgcolor: 'rgba(255,255,255,0.15)', borderRadius: '8px', px: 0.8, py: 0.4, fontSize: '0.7rem' }}>
               {mostrarValor ? '👁' : '🙈'}
