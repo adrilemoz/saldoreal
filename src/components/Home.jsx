@@ -248,8 +248,14 @@ const Home = ({ setRoute }) => {
   );
 
   if (!usuario) return <TelaOnboarding onConcluir={async (nome) => {
-    const rendaDB = await FinanceiroService.getRenda();
-    setRenda(rendaDB); setUsuario(nome); setMostrarHumor(true);
+    const [rendaDB, diaDB] = await Promise.all([
+      FinanceiroService.getRenda(),
+      FinanceiroService.getDiaPagamento(),
+    ]);
+    setRenda(rendaDB);
+    setDiaPagamento(diaDB);
+    setUsuario(nome);
+    setMostrarHumor(true);
   }} />;
 
   if (mostrarHumor) return (
@@ -304,29 +310,47 @@ const Home = ({ setRoute }) => {
             {/* Badge dias para o pagamento */}
             {diasParaPagamento !== null && (
               <Box sx={{
-                display: 'flex', alignItems: 'center', gap: 0.4,
-                px: 1, py: 0.5, borderRadius: '10px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                px: 1.1, py: 0.55, borderRadius: '10px',
                 bgcolor: diasParaPagamento === 0
                   ? 'rgba(16,185,129,0.12)'
+                  : diasParaPagamento === 1
+                  ? 'rgba(251,191,36,0.12)'
                   : diasParaPagamento <= 3
                   ? 'rgba(247,37,133,0.08)'
                   : 'rgba(0,0,0,0.04)',
                 border: `1.5px solid ${diasParaPagamento === 0
                   ? 'rgba(16,185,129,0.35)'
+                  : diasParaPagamento === 1
+                  ? 'rgba(251,191,36,0.4)'
                   : diasParaPagamento <= 3
                   ? 'rgba(247,37,133,0.25)'
                   : 'rgba(0,0,0,0.07)'}`,
               }}>
-                <Typography sx={{ fontSize: '0.7rem' }}>💰</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4, lineHeight: 1 }}>
+                  <Typography sx={{ fontSize: '0.68rem', lineHeight: 1 }}>💰</Typography>
+                  <Typography sx={{
+                    fontSize: '0.68rem', fontWeight: 900, lineHeight: 1,
+                    color: diasParaPagamento === 0
+                      ? '#10B981'
+                      : diasParaPagamento === 1
+                      ? '#FBBF24'
+                      : diasParaPagamento <= 3
+                      ? '#F72585'
+                      : 'text.secondary',
+                  }}>
+                    {diasParaPagamento === 0
+                      ? 'Hoje!'
+                      : diasParaPagamento === 1
+                      ? 'Amanhã!'
+                      : `Faltam ${diasParaPagamento}d`}
+                  </Typography>
+                </Box>
                 <Typography sx={{
-                  fontSize: '0.65rem', fontWeight: 800, lineHeight: 1,
-                  color: diasParaPagamento === 0
-                    ? '#10B981'
-                    : diasParaPagamento <= 3
-                    ? '#F72585'
-                    : 'text.secondary',
+                  fontSize: '0.5rem', fontWeight: 600, lineHeight: 1, mt: 0.25,
+                  color: 'text.disabled', letterSpacing: '0.2px',
                 }}>
-                  {diasParaPagamento === 0 ? 'Hoje!' : `${diasParaPagamento}d`}
+                  p/ salário
                 </Typography>
               </Box>
             )}
