@@ -295,7 +295,7 @@ const App = () => {
     <>
       <Container maxWidth={false} disableGutters sx={{ minHeight: '100vh' }}>
         {/* Wrapper com pb para não ficar atrás da navbar */}
-        <Box sx={{ pb: showNav ? '72px' : 0 }}>
+        <Box sx={{ pb: showNav ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 0 }}>
           {renderComponent()}
         </Box>
       </Container>

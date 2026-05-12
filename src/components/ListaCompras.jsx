@@ -326,6 +326,11 @@ const ListaCompras = ({ setRoute }) => {
     hook.carregarListas();
   }, []);
 
+  // ── resetar scroll ao navegar entre telas ────────────────────────────────
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [tela]);
+
   // ── helpers ───────────────────────────────────────────────────────────────
   const showToast = (texto, cor = 'success.main') => setToast({ open: true, texto, cor });
 
@@ -497,7 +502,7 @@ const ListaCompras = ({ setRoute }) => {
     const listasAbertas = hook.listas.filter(l => l.status === 'aberta');
 
     return (
-      <Box sx={{ maxWidth: 500, margin: 'auto', px: 2, pt: 2, pb: 8 }}>
+      <Box sx={{ maxWidth: 500, margin: 'auto', px: 2, pt: 2, pb: 'calc(88px + env(safe-area-inset-bottom, 0px))' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
           <Button onClick={() => setTela('escolha')} sx={{ color: 'text.secondary', minWidth: 0, p: 0.5 }}>←</Button>
           <Typography sx={{ fontWeight: 900, fontSize: '1.2rem', color: 'text.primary' }}>
@@ -621,7 +626,7 @@ const ListaCompras = ({ setRoute }) => {
   const coletados = itens.filter(i =>  i.marcado || i.status === 'comprado');
 
   return (
-    <Box sx={{ pb: 10, maxWidth: 600, margin: 'auto', px: 2, pt: 2, bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box sx={{ pb: 'calc(88px + env(safe-area-inset-bottom, 0px))', maxWidth: 600, margin: 'auto', px: 2, pt: 2, bgcolor: 'background.default', minHeight: '100vh' }}>
       <Snackbar open={toast.open} autoHideDuration={3000}
         onClose={() => setToast({ ...toast, open: false })}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
